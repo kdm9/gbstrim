@@ -20,7 +20,7 @@ var
 sdist
 develop-eggs
 .installed.cfg
-MANIFEST*
+MANIFEST
 
 # Installer logs
 pip-log.txt
