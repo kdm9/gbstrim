@@ -1,6 +1,8 @@
 gbstrim
 =======
 
+**WARNING: This is alpha software. If it breaks free of your server and goes on
+  a murderous rampage through your FASTQ files, don't blame me.**
 
 Use features of the Genotyping-by-Sequencing protocol to intelligently remove
 second-read read-though from GBS data.
