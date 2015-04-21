@@ -27,3 +27,6 @@ pip-log.txt
 
 .ipynb_checkpoints/
 data
+
+# package dirs
+gbstrim-*/
