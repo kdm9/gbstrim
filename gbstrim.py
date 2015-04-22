@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
 import skbio
 from screed.fastq import fastq_iter
 from itertools import izip
@@ -51,8 +52,10 @@ def pairitr(reads):
 
 def printrecs(r1, r2, stream=sys.stdout):
     for r in [r1, r2]:
-        stream.write(
-            "@{name} {annotations}\n{sequence}\n+\n{quality}\n".format(**r))
+        print("@{name} {annotations}".format(**r), file=stream)
+        print("{sequence}".format(**r), file=stream)
+        print("+", file=stream)
+        print("{quality}".format(**r), file=stream)
 
 def is_dimer(r1, r2, re_len):
     """
@@ -79,6 +82,9 @@ def is_dimer(r1, r2, re_len):
 
 def main_ilfq(ilfq_name, re_site):
     pst1 = SSW(re_site)
+    n_reads = 0
+    n_adapt = 0
+    n_trimmed = 0
     re_len = len(re_site);
     if ilfq_name.endswith("gz"):
         fh = gzip.open(ilfq_name)
@@ -86,6 +92,7 @@ def main_ilfq(ilfq_name, re_site):
         fh = open(ilfq_name)
     reads = fastq_iter(fh)
     for rpair in pairitr(reads):
+        n_reads += 1
         r1, r2 =  rpair
         r1aln = pst1(r1["sequence"][re_len:])
         r2aln = pst1(r2["sequence"][re_len:])
@@ -94,13 +101,22 @@ def main_ilfq(ilfq_name, re_site):
             # Not read-through, but might be dimer.
             if not is_dimer(r1, r2, re_len):
                 printrecs(r1, r2)
+            else:
+                n_adapt += 1
         if r1aln.target_begin == r2aln.target_begin:
             r1["sequence"] = r1["sequence"][:r1aln.target_begin]
             r1["quality"] = r1["quality"][:r1aln.target_begin]
             r2["sequence"] = "N"
             r2["quality"] = "#"
+            n_trimmed += 1
             printrecs(r1, r2)
+        if n_reads % 1000 == 0:
+            print("Processed {:0.0f}K read pairs".format(n_reads /1000.0),
+                  file=sys.stderr, end='\r')
     fh.close()
+    print("Processed", n_reads, "read pairs", file=sys.stderr)
+    print("Trimmed", n_trimmed, file=sys.stderr)
+    print("Adaptor in", n_adapt, file=sys.stderr)
 
 if __name__ == "__main__":
     opts = docopt.docopt(CLI_ARGS)
