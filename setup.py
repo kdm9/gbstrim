@@ -12,9 +12,9 @@ gbstrim: Trim GBS reads of adaptors and reduce over-inflation of allele counts.
 """
 
 install_requires = [
-    "scikit-bio==0.2.3"
-    "screed==0.8"
-    "docopt>=0.6"
+    "scikit-bio==0.2.3",
+    "screed==0.8",
+    "docopt>=0.6",
 ]
 
 test_requires = [
@@ -25,7 +25,7 @@ test_requires = [
 
 setup(
     name="gbstrim",
-    py_modules=['gbstrim', ],
+    scripts=['gbstrim.py'],
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     install_requires=install_requires,
